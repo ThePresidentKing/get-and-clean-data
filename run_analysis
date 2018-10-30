@@ -1,0 +1,42 @@
+# download file and unzip
+fileurl <- 'https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip'
+if (!file.exists('getdata-projectfiles-UCI HAR Dataset.zip')){download.file(fileurl, 'getdata-projectfiles-UCI HAR Dataset.zip', mode = 'wb')}
+unzip("getdata-projectfiles-UCI HAR Dataset.zip")
+
+#load tables
+XTest<- read.table("UCI HAR Dataset/test/X_test.txt")
+
+YTest<- read.table("UCI HAR Dataset/test/Y_test.txt")
+
+XTrain<- read.table("UCI HAR Dataset/train/X_train.txt")
+
+YTrain<- read.table("UCI HAR Dataset/train/Y_train.txt")
+
+SubjectTrain <-read.table("UCI HAR Dataset/train/subject_train.txt")
+
+features<-read.table("UCI HAR Dataset/features.txt")
+activity<-read.table("UCI HAR Dataset/activity_labels.txt")
+
+#merge train and test data
+X<-rbind(XTest, XTrain)
+Y<-rbind(YTest, YTrain)
+Subject<-rbind(SubjectTest, SubjectTrain)
+
+#extract from features only objects taht have "mean" or "std" in name
+index<-grep("mean\\(\\)|std\\(\\)", features[,2])
+
+#rename from activities data
+Y[,1]<-activity[Y[,1],2]
+
+#relabel dataset
+
+names(Subject)<-"SubjectID"
+    names(Y)<-"Activity"
+CleanedData<-cbind(Subject, Y, X)
+head(CleanedData[,c(1:4)])
+
+#tidy up the data
+CleanedData<-data.table(CleanedData)
+TidyData <- CleanedData[, lapply(.SD, mean), by = 'SubjectID,Activity']
+
+write.table(TidyData, file = "Tidy.txt", row.names = FALSE)
