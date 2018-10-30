@@ -1,0 +1,3 @@
+CleanedData<-data.table(CleanedData)
+TidyData <- CleanedData[, lapply(.SD, mean), by = 'SubjectID,Activity'] 
+write.table(TidyData, file = "Tidy.txt", row.names = FALSE)
